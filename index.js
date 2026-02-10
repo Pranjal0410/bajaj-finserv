@@ -7,6 +7,18 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Handle malformed JSON
+app.use((err, req, res, next) => {
+  if (err.type === "entity.parse.failed") {
+    return res.status(400).json({
+      is_success: false,
+      official_email: "pranjal1178.be23@chitkara.edu.in",
+      data: "Invalid JSON in request body",
+    });
+  }
+  next(err);
+});
+
 const OFFICIAL_EMAIL = "pranjal1178.be23@chitkara.edu.in";
 
 // ---------- Utility Functions ----------
@@ -65,7 +77,7 @@ async function askAI(question) {
   }
 
   const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
   const result = await model.generateContent(
     `Answer the following question in exactly one word. No punctuation, no explanation, just one word.\n\nQuestion: ${question}`
